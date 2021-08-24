@@ -35,6 +35,10 @@ class Connection extends Component
      */
     public $autodetectCluster = true;
     /**
+     * @var bool set to False to disable ssl certificate issuer validation
+     */
+    public $ignoreCertValidation = true;
+    /**
      * @var array The Elasticsearch cluster nodes to connect to.
      *
      * This is populated with the result of a cluster nodes request when [[autodetectCluster]] is true.
@@ -453,6 +457,12 @@ class Connection extends Component
             CURLOPT_CUSTOMREQUEST  => $method,
             CURLOPT_FORBID_REUSE   => false,
         ];
+
+        if ($this->ignoreCertValidation === true) {
+            $options[CURLOPT_SSL_VERIFYHOST]    = false;
+            $options[CURLOPT_SSL_VERIFYPEER]    = false;
+            $options[CURLOPT_SSL_VERIFYSTATUS]  = false;
+        }
 
         if (!empty($this->auth) || isset($this->nodes[$this->activeNode]['auth']) && $this->nodes[$this->activeNode]['auth'] !== false) {
             $auth = isset($this->nodes[$this->activeNode]['auth']) ? $this->nodes[$this->activeNode]['auth'] : $this->auth;
